@@ -21,7 +21,7 @@ pose_ = Pose()
 desired_position_ = Point()
 desired_position_.z = 0
 regions_ = None
-state_desc_ = ['Go to point', 'wall following', 'done']
+state_desc_ = ['Go to point', 'wall following', 'done', 'cancelled']
 state_ = 0
 # 0 - go to point
 # 1 - wall following
@@ -73,6 +73,9 @@ def change_state(state):
     if state_ == 2:
         resp = srv_client_go_to_point_(False)
         resp = srv_client_wall_follower_(False)
+    if state_ == 3:
+        resp = srv_client_go_to_point_(False)
+        resp = srv_client_wall_follower_(False)
 
 
 def normalize_angle(angle):
@@ -113,7 +116,7 @@ def planning(goal):
             act_s.publish_feedback(feedback)
             act_s.set_preempted()
             success = False
-            change_state(2)
+            change_state(3)
             done()
             break
         elif err_pos < 0.5:
@@ -176,7 +179,7 @@ def main():
         '/wall_follower_switch', SetBool)
     act_s = actionlib.SimpleActionServer('/reaching_goal', assignment_2_2024.msg.PlanningAction, planning, auto_start=False)
     act_s.start()
-   
+
     # initialize going to the point
     
 
